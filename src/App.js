@@ -1,25 +1,42 @@
-import logo from './logo.svg';
-import './App.css';
+import React, { useState } from 'react';
+import Login from './pages/Login';
+import Home from './pages/Home';
+import ProjectDashboard from './pages/ProjectDashboard';
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+export default function App() {
+    const [user, setUser] = useState(() => {
+        const saved = localStorage.getItem('user');
+        return saved ? JSON.parse(saved) : null;
+    });
+    const [selectedProject, setSelectedProject] = useState(null);
+
+    const handleLogin = (userData) => {
+        setUser(userData);
+    };
+
+    const handleLogout = () => {
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        setUser(null);
+        setSelectedProject(null);
+    };
+
+    if (!user) return <Login onLogin={handleLogin} />;
+
+    if (selectedProject) return (
+        <ProjectDashboard
+            user={user}
+            project={selectedProject}
+            onBack={() => setSelectedProject(null)}
+            onLogout={handleLogout}
+        />
+    );
+
+    return (
+        <Home
+            user={user}
+            onLogout={handleLogout}
+            onSelectProject={setSelectedProject}
+        />
+    );
 }
-
-export default App;
